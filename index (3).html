@@ -1,0 +1,669 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Администрация Flud Adskij Boss</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;900&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: a hot, loud descent. Seal hero with rising embers, a four-step rank ladder in four fire colours, rights/duties/bans as icon checklists, a pyramid for the chain of command, situation cards, a punishment ladder. Single dark look by choice. */
+:root {
+  --bg: #14070b;
+  --bg-2: #1d0c12;
+  --panel: #230f17;
+  --line: #4a1c25;
+  --fg: #fff3e6;
+  --muted: #d9b9ae;
+  --ink: #1a0508;
+  --red: #ff3048;
+  --orange: #ff7a1a;
+  --yellow: #ffd23f;
+  --pink: #ff3d8b;
+  --font-display: "Unbounded", "Arial Black", Impact, sans-serif;
+  --font-body: "Golos Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 48px;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0 0 auto;
+  height: env(safe-area-inset-top, 0px);
+  z-index: 10;
+  background: var(--bg);
+}
+#embers { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+.wrap { position: relative; z-index: 1; max-width: 960px; margin: 0 auto; }
+svg.i { width: 1.25em; height: 1.25em; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--yellow); outline-offset: 2px; }
+
+/* Page switch */
+.switch { display: flex; gap: 8px; padding-top: 18px; flex-wrap: wrap; }
+.switch a {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--muted);
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+}
+.switch a:hover { color: var(--fg); border-color: var(--orange); }
+.switch a[aria-current] { background: var(--yellow); border-color: var(--yellow); color: var(--ink); font-weight: 500; }
+
+/* Hero */
+.hero {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px 40px;
+  align-items: center;
+  padding-block: 28px 32px;
+}
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: -20px -16px 0;
+  z-index: -1;
+  background:
+    radial-gradient(55% 60% at 80% 20%, rgba(255, 48, 72, 0.32), transparent 70%),
+    radial-gradient(45% 50% at 15% 90%, rgba(255, 122, 26, 0.2), transparent 70%),
+    radial-gradient(35% 35% at 50% 0%, rgba(255, 210, 63, 0.12), transparent 70%);
+  pointer-events: none;
+}
+.seal { width: min(70vw, 300px); margin: 0 auto; filter: drop-shadow(0 0 28px rgba(255, 90, 40, 0.55)); }
+.seal .spin { transform-origin: 150px 180px; animation: spin 48s linear infinite; }
+.seal .pulse { transform-origin: 150px 192px; animation: pulse 2.6s ease-in-out infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+.kicker {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--orange);
+  margin: 0 0 14px;
+}
+h1 { margin: 0; font-family: var(--font-display); font-weight: 900; text-transform: uppercase; line-height: 1; }
+h1 .l1 { display: block; font-size: clamp(1.45rem, 7.2vw, 3.1rem); letter-spacing: -0.02em; overflow-wrap: anywhere; }
+h1 .l2 {
+  display: block;
+  font-size: clamp(2.6rem, 14vw, 6rem);
+  margin-top: 6px;
+  background: linear-gradient(90deg, var(--yellow), var(--orange) 55%, var(--red));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.intro { margin: 22px 0 0; max-width: 56ch; color: var(--muted); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 22px 0 0; padding: 0; list-style: none; }
+.chips li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px 6px 10px;
+  border-radius: 999px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  font-size: 0.9rem;
+}
+.chips b { font-family: var(--font-mono); font-weight: 500; color: var(--c); }
+.chips li:nth-child(1) { --c: var(--yellow); }
+.chips li:nth-child(2) { --c: var(--orange); }
+.chips li:nth-child(3) { --c: var(--red); }
+.chips li:nth-child(4) { --c: var(--pink); }
+.chips li:nth-child(5) { --c: var(--yellow); }
+@media (min-width: 820px) {
+  .hero { grid-template-columns: 1.3fr 1fr; padding-block: 40px 44px; }
+  .seal { grid-column: 2; grid-row: 1; width: 100%; }
+}
+
+/* Tabs */
+.tabs {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 5;
+  background: var(--bg);
+  border-block: 1px solid var(--line);
+  margin-inline: calc(-1 * max(16px, env(safe-area-inset-left, 0px)));
+  padding-inline: max(16px, env(safe-area-inset-left, 0px));
+}
+.tabs-inner { max-width: 960px; margin: 0 auto; display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; padding-block: 8px; }
+.tabs-inner::-webkit-scrollbar { display: none; }
+.tabs a {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+.tabs a svg { color: var(--c); width: 1.1em; height: 1.1em; }
+.tabs a:hover { color: var(--fg); background: var(--panel); }
+.tabs a.on { color: var(--ink); background: var(--c); }
+.tabs a.on svg { color: var(--ink); }
+
+/* Sections */
+.sec { padding-block: 44px 8px; scroll-margin-top: calc(60px + env(safe-area-inset-top, 0px)); }
+.sec-head { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+.rn {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(2.4rem, 11vw, 4rem);
+  line-height: 1;
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--c);
+  min-width: 1.4em;
+}
+h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(1rem, 4.4vw, 1.5rem);
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.lead { margin: 0 0 20px; max-width: 62ch; color: var(--muted); }
+
+/* Rank ladder */
+.ranks { display: grid; gap: 0; max-width: 760px; }
+.rank { background: var(--panel); border-radius: 10px; overflow: hidden; }
+.rank-top {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  background: var(--c);
+  color: var(--ink);
+}
+.rank-ico {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--c);
+}
+.rank-ico svg { width: 28px; height: 28px; }
+.rank-top div { min-width: 0; }
+.rank-lvl { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase; opacity: 0.75; }
+.rank-name { font-family: var(--font-display); font-weight: 900; font-size: clamp(1.1rem, 5vw, 1.5rem); line-height: 1.15; overflow-wrap: anywhere; }
+.rank-title { font-weight: 600; font-size: 0.95rem; }
+.rank p { margin: 0; padding: 16px 18px 18px; overflow-wrap: anywhere; }
+.link-up {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+  padding: 10px 0;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.link-up svg { color: var(--orange); }
+.r1 { --c: var(--yellow); }
+.r2 { --c: var(--orange); }
+.r3 { --c: var(--red); }
+.r4 { --c: var(--pink); }
+
+/* Checklists */
+.checks { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr; gap: 10px; }
+.checks li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--panel);
+  border-radius: 8px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.checks .mark {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--c);
+  color: var(--ink);
+}
+.checks .mark svg { width: 16px; height: 16px; stroke-width: 3; }
+@media (min-width: 700px) { .checks { grid-template-columns: 1fr 1fr; } }
+.rights { --c: var(--yellow); }
+.duties { --c: var(--orange); }
+.bans { --c: var(--red); }
+.sub { margin: 0 0 14px; font-weight: 600; }
+
+/* Pyramid */
+.pyramid { display: grid; gap: 8px; justify-items: center; }
+.step {
+  width: var(--w);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: var(--c);
+  color: var(--ink);
+  min-width: 0;
+}
+.step b { font-family: var(--font-display); font-weight: 900; font-size: 1.5rem; line-height: 1; }
+.step span { min-width: 0; overflow-wrap: anywhere; font-weight: 500; line-height: 1.35; }
+.step strong { display: block; font-family: var(--font-display); font-weight: 600; font-size: 0.95rem; }
+.note {
+  margin-top: 18px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 14px 16px;
+  background: var(--panel);
+  border-radius: 10px;
+  max-width: 62ch;
+}
+.note svg { color: var(--yellow); margin-top: 3px; }
+.note p { margin: 0; overflow-wrap: anywhere; min-width: 0; }
+
+/* Situations */
+.cases { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 14px; }
+.case { background: var(--panel); border-radius: 12px; padding: 18px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.case-top { display: flex; align-items: center; gap: 10px; color: var(--c); }
+.case-top span { font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.16em; text-transform: uppercase; }
+.case h3 { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: 1.05rem; line-height: 1.25; overflow-wrap: anywhere; }
+.case p { margin: 0; color: var(--muted); overflow-wrap: anywhere; }
+.case:nth-child(5n+1) { --c: var(--yellow); }
+.case:nth-child(5n+2) { --c: var(--orange); }
+.case:nth-child(5n+3) { --c: var(--red); }
+.case:nth-child(5n+4) { --c: var(--pink); }
+.case:nth-child(5n+5) { --c: var(--yellow); }
+
+/* Ladder */
+.ladder { list-style: none; margin: 0 0 18px; padding: 0; display: grid; gap: 10px; max-width: 640px; }
+.ladder li {
+  display: grid;
+  grid-template-columns: 2.4rem 1fr;
+  gap: 6px 12px;
+  padding: 12px 14px 14px;
+  background: var(--panel);
+  border-radius: 8px;
+  overflow-wrap: anywhere;
+}
+.ladder .lv { font-family: var(--font-mono); color: var(--yellow); }
+.ladder .bar { grid-column: 2; height: 5px; border-radius: 3px; background: var(--line); position: relative; overflow: hidden; }
+.ladder .bar::after { content: ""; position: absolute; inset: 0 auto 0 0; width: calc(var(--lvl) * 20%); background: linear-gradient(90deg, var(--yellow), var(--orange), var(--red)); }
+
+/* Conclusion */
+.finale {
+  margin-top: 48px;
+  padding: 32px 20px;
+  border-radius: 16px;
+  background:
+    radial-gradient(70% 90% at 90% 0%, rgba(255, 122, 26, 0.35), transparent 70%),
+    linear-gradient(135deg, #3a0d17, #1d0c12);
+  border: 1px solid var(--line);
+}
+.finale .fl { display: flex; gap: 6px; color: var(--orange); margin-bottom: 14px; }
+.finale h2 { font-size: clamp(1.3rem, 6vw, 2rem); margin-bottom: 16px; }
+.finale p { margin: 0 0 12px; max-width: 60ch; overflow-wrap: anywhere; }
+.finale p:last-of-type { margin-bottom: 0; }
+footer { padding-block: 40px 8px; text-align: left; }
+.sig {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(1rem, 5vw, 1.6rem);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  background: linear-gradient(90deg, var(--yellow), var(--orange), var(--red));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin: 0 0 16px;
+  overflow-wrap: anywhere;
+}
+.back { display: inline-flex; align-items: center; gap: 8px; color: var(--fg); text-decoration: none; border-bottom: 2px solid var(--orange); padding-bottom: 2px; }
+.back:hover { color: var(--yellow); }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .seal .spin, .seal .pulse { animation: none; }
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-crown" viewBox="0 0 24 24"><path d="M3 19h18M4 17 3 7l5 4 4-7 4 7 5-4-1 10z"/></symbol>
+    <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 2c1 4 6 6 6 12a6 6 0 0 1-12 0c0-3 1.500-4.500 3-6 0 2 .8 3 2 3 0-4-1.500-6 1-9z"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-fork" viewBox="0 0 24 24"><path d="M12 22V8M5 3v5a7 7 0 0 0 14 0V3M12 3v5"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 2l8 3v6c0 5-3.500 9-8 11-4.500-2-8-6-8-11V5z"/></symbol>
+    <symbol id="i-scroll" viewBox="0 0 24 24"><path d="M6 3h11a2 2 0 0 1 2 2v13a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V3zM9 8h7M9 12h7M9 16h4"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19"/></symbol>
+    <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></symbol>
+    <symbol id="i-scales" viewBox="0 0 24 24"><path d="M12 3v18M6 21h12M4 7h16M5 7l-3 7h6zM19 7l-3 7h6z"/></symbol>
+    <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 4h16v12H9l-5 4z"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2l3 7 7 .8-5.300 4.800 1.600 7.400L12 18l-6.300 4 1.600-7.400L2 9.800 9 9z"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.500"/><path d="M2 21c0-4 3-6 7-6s7 2 7 6M16 4.500a3.500 3.500 0 0 1 0 7M18 15c2.500.7 4 2.500 4 6"/></symbol>
+    <symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 3 2 21h20zM12 10v5M12 18v.5"/></symbol>
+  </defs>
+</svg>
+
+<canvas id="embers" aria-hidden="true"></canvas>
+
+<div class="wrap">
+
+  <header class="hero">
+    <svg class="seal" viewBox="0 0 300 320" role="img" aria-label="Адская печать с рогами и пламенем">
+      <defs>
+        <linearGradient id="fire" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#ffd23f"/>
+          <stop offset="0.5" stop-color="#ff7a1a"/>
+          <stop offset="1" stop-color="#ff3048"/>
+        </linearGradient>
+        <radialGradient id="disc" cx="50%" cy="55%" r="60%">
+          <stop offset="0" stop-color="#4a0f1c"/>
+          <stop offset="1" stop-color="#1a070c"/>
+        </radialGradient>
+        <path id="ring" d="M150,180 m-122,0 a122,122 0 1,1 244,0 a122,122 0 1,1 -244,0"/>
+      </defs>
+      <path d="M104 80C78 58 72 30 90 6c6 28 28 40 42 58z" fill="url(#fire)"/>
+      <path d="M196 80c26-22 32-50 14-74-6 28-28 40-42 58z" fill="url(#fire)"/>
+      <circle cx="150" cy="180" r="140" fill="url(#disc)" stroke="url(#fire)" stroke-width="4"/>
+      <circle cx="150" cy="180" r="92" fill="none" stroke="#ff7a1a" stroke-width="2" stroke-dasharray="3 9" stroke-linecap="round"/>
+      <g class="spin">
+        <text font-family="Unbounded, Arial Black, sans-serif" font-weight="900" font-size="15" fill="#ffd23f">
+          <textPath href="#ring" textLength="760" lengthAdjust="spacing">FLUD ADSKIJ BOSS • АДМИНИСТРАЦИЯ • FLUD ADSKIJ BOSS • АДМИНИСТРАЦИЯ •</textPath>
+        </text>
+      </g>
+      <g class="pulse">
+        <path d="M150 112c9 28 38 40 38 76a38 38 0 0 1-76 0c0-18 9-28 18-38 2 14 8 20 14 20-6-24-6-42 6-58z" fill="url(#fire)"/>
+        <path d="M150 158c5 12 18 18 18 34a18 18 0 0 1-36 0c0-9 6-13 11-18 4-4 5-10 7-16z" fill="#fff1a8"/>
+      </g>
+    </svg>
+
+    <div>
+      <p class="kicker">Flud Adskij Boss</p>
+      <h1><span class="l1">Администрация</span><span class="l2">и её права</span></h1>
+      <p class="intro">Администрация — основа порядка и организации нашего флуда. Каждый представитель администрации несёт ответственность за свои действия, решения и отношение к участникам. Наличие должности означает не превосходство над остальными, а дополнительные обязанности и полномочия.</p>
+      <ul class="chips" aria-label="Что на этой странице">
+        <li><b>4</b> должности</li>
+        <li><b>8</b> прав</li>
+        <li><b>9</b> обязанностей</li>
+        <li><b>8</b> запретов</li>
+        <li><b>5</b> мер ответственности</li>
+      </ul>
+    </div>
+  </header>
+</div>
+
+<nav class="tabs" aria-label="Разделы">
+  <div class="tabs-inner" id="tabs">
+    <a href="#s1" style="--c:var(--yellow)"><svg class="i"><use href="#i-crown"/></svg>Состав</a>
+    <a href="#s2" style="--c:var(--yellow)"><svg class="i"><use href="#i-check"/></svg>Права</a>
+    <a href="#s3" style="--c:var(--orange)"><svg class="i"><use href="#i-shield"/></svg>Обязанности</a>
+    <a href="#s4" style="--c:var(--red)"><svg class="i"><use href="#i-x"/></svg>Запреты</a>
+    <a href="#s5" style="--c:var(--pink)"><svg class="i"><use href="#i-up"/></svg>Решения</a>
+    <a href="#s6" style="--c:var(--orange)"><svg class="i"><use href="#i-chat"/></svg>Примеры</a>
+    <a href="#s7" style="--c:var(--red)"><svg class="i"><use href="#i-scales"/></svg>Ответственность</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <section class="sec" id="s1" style="--c:var(--yellow)">
+    <div class="sec-head"><span class="rn">Ⅰ</span><h2>СОСТАВ АДМИНИСТРАЦИИ</h2></div>
+    <div class="ranks">
+      <article class="rank r1">
+        <div class="rank-top">
+          <span class="rank-ico"><svg class="i"><use href="#i-crown"/></svg></span>
+          <div><div class="rank-lvl">Высший уровень</div><div class="rank-title">Владелец</div><div class="rank-name">Физзароли</div></div>
+        </div>
+        <p>Главный руководитель флуда. Обладает высшими полномочиями, принимает окончательные решения, утверждает правила, назначает и снимает представителей администрации, определяет общую политику и направление развития чата.</p>
+      </article>
+      <div class="link-up"><svg class="i"><use href="#i-up"/></svg>выше только правила</div>
+      <article class="rank r2">
+        <div class="rank-top">
+          <span class="rank-ico"><svg class="i"><use href="#i-flame"/></svg></span>
+          <div><div class="rank-lvl">Второй уровень</div><div class="rank-title">Совладелец</div><div class="rank-name">Милли</div></div>
+        </div>
+        <p>Правая рука владельца. Помогает управлять флудом, контролирует работу администрации, следит за активностью и порядком, рассматривает обращения участников. Может принимать необходимые решения в отсутствие владельца в пределах предоставленных полномочий.</p>
+      </article>
+      <div class="link-up"><svg class="i"><use href="#i-up"/></svg>передаёт серьёзные вопросы выше</div>
+      <article class="rank r3">
+        <div class="rank-top">
+          <span class="rank-ico"><svg class="i"><use href="#i-eye"/></svg></span>
+          <div><div class="rank-lvl">Третий уровень</div><div class="rank-title">Старший администратор</div><div class="rank-name">Тилла</div></div>
+        </div>
+        <p>Контролирует работу администраторов, следит за соблюдением правил, помогает разбирать сложные ситуации, рассматривает жалобы и передаёт серьёзные вопросы руководству. Следит за тем, чтобы администрация выполняла свои обязанности.</p>
+      </article>
+      <div class="link-up"><svg class="i"><use href="#i-up"/></svg>сообщает о серьёзных нарушениях</div>
+      <article class="rank r4">
+        <div class="rank-top">
+          <span class="rank-ico"><svg class="i"><use href="#i-fork"/></svg></span>
+          <div><div class="rank-lvl">Четвёртый уровень</div><div class="rank-title">Средний администратор</div><div class="rank-name">Блиц</div></div>
+        </div>
+        <p>Поддерживает порядок в чате, следит за поведением участников, делает замечания, выдаёт предупреждения и применяет другие меры в пределах своих полномочий. Помогает разбирать конфликты и сообщает старшей администрации о серьёзных нарушениях.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="sec" id="s2" style="--c:var(--yellow)">
+    <div class="sec-head"><span class="rn">Ⅱ</span><h2>ПРАВА АДМИНИСТРАЦИИ</h2></div>
+    <p class="lead">Каждый представитель администрации в соответствии со своей должностью имеет право:</p>
+    <ul class="checks rights">
+      <li><span class="mark"><svg class="i"><use href="#i-check"/></svg></span>Делать замечания за нарушение установленных правил.</li>
+      <li><span class="mark"><svg class="i"><use href="#i-check"/></svg></span>Выдавать предупреждения, муты и временные баны в пределах полномочий.</li>
+      <li><span class="mark"><svg class="i"><use href="#i-check"/></svg></span>Рассматривать обращения и жалобы участников.</li>
+      <li><span class="mark"><svg class="i"><use href="#i-check"/></svg></span>Запрашивать объяснения при разборе конфликтов.</li>
+      <li><span class="mark"><svg class="i"><use href="#i-check"/></svg></span>Удалять сообщения, нарушающие правила.</li>
+      <li><span class="mark"><svg class="i"><use href="#i-check"/></svg></span>Предлагать изменения в организации флуда.</li>
+      <li><span class="mark"><svg class="i"><use href="#i-check"/></svg></span>Участвовать в проверке и принятии новых участников.</li>
+      <li><span class="mark"><svg class="i"><use href="#i-check"/></svg></span>Передавать серьёзные вопросы вышестоящей администрации.</li>
+    </ul>
+  </section>
+
+  <section class="sec" id="s3" style="--c:var(--orange)">
+    <div class="sec-head"><span class="rn">Ⅲ</span><h2>ОБЯЗАННОСТИ АДМИНИСТРАЦИИ</h2></div>
+    <p class="lead">Каждый администратор обязан:</p>
+    <ul class="checks duties">
+      <li><span class="mark"><svg class="i"><use href="#i-bolt"/></svg></span>Следить за порядком и атмосферой в чате.</li>
+      <li><span class="mark"><svg class="i"><use href="#i-bolt"/></svg></span>Соблюдать правила наравне с обычными участниками.</li>
+      <li><span class="mark"><svg class="i"><use href="#i-bolt"/></svg></span>Относиться к участникам справедливо.</li>
+      <li><span class="mark"><svg class="i"><use href="#i-bolt"/></svg></span>Рассматривать обоснованные жалобы.</li>
+      <li><span class="mark"><svg class="i"><use href="#i-bolt"/></svg></span>Не допускать злоупотребления полномочиями.</li>
+      <li><span class="mark"><svg class="i"><use href="#i-bolt"/></svg></span>Помогать участникам с организационными вопросами.</li>
+      <li><span class="mark"><svg class="i"><use href="#i-bolt"/></svg></span>Следить за соблюдением установленной системы наказаний.</li>
+      <li><span class="mark"><svg class="i"><use href="#i-bolt"/></svg></span>Сообщать руководству о серьёзных нарушениях и спорных ситуациях.</li>
+      <li><span class="mark"><svg class="i"><use href="#i-bolt"/></svg></span>Поддерживать связь с остальными представителями администрации.</li>
+    </ul>
+  </section>
+
+  <section class="sec" id="s4" style="--c:var(--red)">
+    <div class="sec-head"><span class="rn">Ⅳ</span><h2>ЗАПРЕТЫ ДЛЯ АДМИНИСТРАЦИИ</h2></div>
+    <p class="lead">Представителям администрации запрещается:</p>
+    <ul class="checks bans">
+      <li><span class="mark"><svg class="i"><use href="#i-x"/></svg></span>Использовать должность для личной выгоды.</li>
+      <li><span class="mark"><svg class="i"><use href="#i-x"/></svg></span>Выдавать наказания из-за личной неприязни.</li>
+      <li><span class="mark"><svg class="i"><use href="#i-x"/></svg></span>Угрожать участникам своим статусом.</li>
+      <li><span class="mark"><svg class="i"><use href="#i-x"/></svg></span>Разглашать личную информацию и частные переписки без согласия участников.</li>
+      <li><span class="mark"><svg class="i"><use href="#i-x"/></svg></span>Намеренно покрывать нарушения друзей или других администраторов.</li>
+      <li><span class="mark"><svg class="i"><use href="#i-x"/></svg></span>Самовольно превышать предоставленные полномочия.</li>
+      <li><span class="mark"><svg class="i"><use href="#i-x"/></svg></span>Создавать конфликты внутри администрации.</li>
+      <li><span class="mark"><svg class="i"><use href="#i-x"/></svg></span>Игнорировать обязанности, ссылаясь на собственную должность.</li>
+    </ul>
+  </section>
+
+  <section class="sec" id="s5" style="--c:var(--pink)">
+    <div class="sec-head"><span class="rn">Ⅴ</span><h2>ПОРЯДОК ПРИНЯТИЯ РЕШЕНИЙ</h2></div>
+    <p class="lead">Для сохранения порядка действует следующая иерархия:</p>
+    <div class="pyramid">
+      <div class="step" style="--w:68%;--c:var(--yellow)"><b>1</b><span><strong>Владелец</strong>принимает окончательные решения.</span></div>
+      <div class="step" style="--w:80%;--c:var(--orange)"><b>2</b><span><strong>Совладелец</strong>помогает владельцу и может действовать от его имени в пределах своих полномочий.</span></div>
+      <div class="step" style="--w:92%;--c:var(--red)"><b>3</b><span><strong>Старший администратор</strong>контролирует работу администрации и разбирает сложные ситуации.</span></div>
+      <div class="step" style="--w:100%;--c:var(--pink)"><b>4</b><span><strong>Средний администратор</strong>занимается повседневной модерацией и поддержанием порядка.</span></div>
+    </div>
+    <div class="note">
+      <svg class="i"><use href="#i-warn"/></svg>
+      <p>Нижестоящие представители администрации обязаны учитывать решения вышестоящего руководства. Если вопрос выходит за пределы их полномочий, его необходимо передать выше.</p>
+    </div>
+  </section>
+
+  <section class="sec" id="s6" style="--c:var(--orange)">
+    <div class="sec-head"><span class="rn">Ⅵ</span><h2>ПРИМЕРЫ РАБОТЫ АДМИНИСТРАЦИИ</h2></div>
+    <div class="cases">
+      <article class="case">
+        <div class="case-top"><svg class="i"><use href="#i-chat"/></svg><span>Ситуация №1</span></div>
+        <h3>Нарушение правил</h3>
+        <p>Участник отправляет спам. Средний администратор делает замечание или применяет соответствующее наказание.</p>
+      </article>
+      <article class="case">
+        <div class="case-top"><svg class="i"><use href="#i-warn"/></svg><span>Ситуация №2</span></div>
+        <h3>Повторные нарушения</h3>
+        <p>Участник продолжает нарушать правила после предупреждений. Администратор передаёт информацию старшему администратору для дальнейшего рассмотрения.</p>
+      </article>
+      <article class="case">
+        <div class="case-top"><svg class="i"><use href="#i-scales"/></svg><span>Ситуация №3</span></div>
+        <h3>Жалоба на администратора</h3>
+        <p>Участник считает, что представитель администрации превысил полномочия. Жалоба передаётся совладельцу или владельцу для независимого рассмотрения.</p>
+      </article>
+      <article class="case">
+        <div class="case-top"><svg class="i"><use href="#i-flame"/></svg><span>Ситуация №4</span></div>
+        <h3>Серьёзный конфликт</h3>
+        <p>Между участниками возникает серьёзная ссора. Администратор временно прекращает нарушение порядка и передаёт ситуацию старшей администрации.</p>
+      </article>
+      <article class="case">
+        <div class="case-top"><svg class="i"><use href="#i-scroll"/></svg><span>Ситуация №5</span></div>
+        <h3>Изменение правил</h3>
+        <p>Участник предлагает новое правило. Предложение может быть рассмотрено, однако утверждать изменения вправе руководство.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="sec" id="s7" style="--c:var(--red)">
+    <div class="sec-head"><span class="rn">Ⅶ</span><h2>ОТВЕТСТВЕННОСТЬ АДМИНИСТРАЦИИ</h2></div>
+    <p class="lead">За злоупотребление должностью, систематическое нарушение правил, несправедливые наказания или невыполнение обязанностей представитель администрации может получить:</p>
+    <ol class="ladder">
+      <li style="--lvl:1"><span class="lv">01</span><span>Замечание.</span><span class="bar"></span></li>
+      <li style="--lvl:2"><span class="lv">02</span><span>Предупреждение.</span><span class="bar"></span></li>
+      <li style="--lvl:3"><span class="lv">03</span><span>Временное ограничение полномочий.</span><span class="bar"></span></li>
+      <li style="--lvl:4"><span class="lv">04</span><span>Понижение в должности.</span><span class="bar"></span></li>
+      <li style="--lvl:5"><span class="lv">05</span><span>Полное снятие с должности.</span><span class="bar"></span></li>
+    </ol>
+    <div class="note">
+      <svg class="i"><use href="#i-scales"/></svg>
+      <p>Решение о применении мер к представителям администрации принимает руководство с учётом обстоятельств ситуации.</p>
+    </div>
+  </section>
+
+  <section class="finale" aria-labelledby="fin">
+    <div class="fl"><svg class="i"><use href="#i-flame"/></svg><svg class="i"><use href="#i-star"/></svg><svg class="i"><use href="#i-flame"/></svg></div>
+    <h2 id="fin">ЗАКЛЮЧЕНИЕ</h2>
+    <p>Должность — это не привилегия для превосходства над остальными, а ответственность за порядок, организацию и безопасность общения.</p>
+    <p>Каждый представитель администрации должен понимать границы своих полномочий, уважать участников и отвечать за собственные решения.</p>
+    <p>Иерархия существует для организации работы, а не для личного возвышения.</p>
+  </section>
+
+</main>
+
+<footer class="wrap">
+  <p class="sig">Администрация Flud Adskij Boss.</p>
+</footer>
+
+<script>
+(function () {
+  var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // Rising embers
+  var cv = document.getElementById("embers");
+  var ctx = cv.getContext && cv.getContext("2d");
+  if (ctx) {
+    var W = 0, H = 0, dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var colors = ["255,210,63", "255,122,26", "255,48,72", "255,61,139"];
+    var ps = [];
+    function size() {
+      W = window.innerWidth; H = window.innerHeight;
+      cv.width = W * dpr; cv.height = H * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    function make(fresh) {
+      return {
+        x: Math.random() * W,
+        y: fresh ? Math.random() * H : H + 10,
+        r: 1 + Math.random() * 2.4,
+        v: 0.25 + Math.random() * 0.8,
+        d: (Math.random() - 0.5) * 0.4,
+        c: colors[(Math.random() * colors.length) | 0],
+        a: 0.25 + Math.random() * 0.5
+      };
+    }
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      for (var i = 0; i < ps.length; i++) {
+        var p = ps[i];
+        ctx.beginPath();
+        ctx.fillStyle = "rgba(" + p.c + "," + p.a + ")";
+        ctx.arc(p.x, p.y, p.r, 0, 6.2832);
+        ctx.fill();
+        if (!reduce) {
+          p.y -= p.v; p.x += p.d + Math.sin(p.y / 40) * 0.2;
+          if (p.y < -10) ps[i] = make(false);
+        }
+      }
+      if (!reduce) requestAnimationFrame(draw);
+    }
+    size();
+    var n = W < 600 ? 28 : 55;
+    for (var k = 0; k < n; k++) ps.push(make(true));
+    window.addEventListener("resize", function () { size(); if (reduce) draw(); });
+    draw();
+  }
+
+  // Highlight the tab of the section in view
+  var tabs = document.getElementById("tabs");
+  var links = {};
+  tabs.querySelectorAll("a").forEach(function (a) { links[a.getAttribute("href").slice(1)] = a; });
+  function setOn(id) {
+    Object.keys(links).forEach(function (k) { links[k].classList.toggle("on", k === id); });
+    var a = links[id];
+    if (a && tabs.scrollWidth > tabs.clientWidth) {
+      tabs.scrollLeft = a.offsetLeft - (tabs.clientWidth - a.offsetWidth) / 2;
+    }
+  }
+  if ("IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) setOn(e.target.id); });
+    }, { rootMargin: "-30% 0px -60% 0px" });
+    document.querySelectorAll(".sec").forEach(function (s) { io.observe(s); });
+  }
+})();
+</script>
+</body>
+</html>
